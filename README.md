@@ -3,41 +3,48 @@
 
 <?php
 session_start();
-require 'database.php';
 if( isset($_SESSION['user_id']) ){
-	$records = $conn->prepare('SELECT id, user, email,password FROM cphlogin_users WHERE id = :id');
-	$records->bindParam(':id', $_SESSION['user_id']);
+	header("Location: /");
+}
+require 'database.php';
+if(!empty($_POST['user']) &&  !empty($_POST['password'])):
+	
+	$records = $conn->prepare('SELECT id,user,email,password FROM cphlogin_users WHERE name = :name');
+	$records->bind_param(':user', $_POST['user']);
 	$records->execute();
 	$results = $records->fetch(PDO::FETCH_ASSOC);
-	$user = NULL;
-	if( count($results) > 0){
-		$user = $results;
+	$message = '';
+	if(count($results) > 0 && password_verify($_POST['password'], $results['password']) ){
+		$_SESSION['user_id'] = $results['id'];
+		header("Location: /");
+	} else {
+		$message = 'Beklager, men kodeordene er ikke ens.';
 	}
-}
+endif;
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Ninettes hemmelighed</title>
+	<title>Log ind</title>
 </head>
 <body>
 
+	<a href="index.php">Tilbage til forsiden</a>
 
-	<?php if( !empty($user) ): ?>
-
-		<br />Velkommen <?= $user['user']; ?> 
-		<br /><br />Du er nu logget ind. Her er min hemmelighed... Jeg har meget svært ved at fosrtå PHP.
-		<br /><br />
-		<a href="logout.php">Logout?</a>
-
-	<?php else: ?>
-
-		<h1>Log ind og opdag min hemmelighed</h1>
-		<a href="login.php">Log ind</a> eller
-		<a href="registerform.php">Opret bruger</a>
-
+	<?php if(!empty($message)): ?>
+		<p><?= $message ?></p>
 	<?php endif; ?>
 
+	<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
+		<fieldset>
+        	<legend>Log ind</legend>
+            <input type="text" placeholder="Brugernavn" name="name"><br>
+            <input type="password" placeholder="Kodeord" name="password"><br>
+			<input type="submit">
+		</fieldset>
+	</form>
+
+	<span>Gå til <a href="registerform.php">Opret bruger</a></span>
 </body>
 </html>
