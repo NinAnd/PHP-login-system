@@ -2,21 +2,14 @@
 3. semester, Modul 2, opgave 2.
 
 <?php
-session_start();
+const DB_HOST = 'localhost';
+const DB_USER = '';
+const DB_PASS = '';
+const DB_NAME = 'mademois_nin';
 
-if(isset($_SESSION['usr_id'])) {
-    session_destroy();
-    unset($_SESSION['usr_id']);
-    unset($_SESSION['usr_name']);
-    header("Location: index.php");
-} else {
-    header("Location: index.php");
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) { 
+   die('Connect Error ('.$conn->connect_errno.') '.$connlink->connect_error);
 }
+$conn->set_charset('utf8'); 
 ?>
-
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Untitled Document</title>
-</head>
