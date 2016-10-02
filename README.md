@@ -3,48 +3,20 @@
 
 <?php
 session_start();
-if( isset($_SESSION['user_id']) ){
-	header("Location: /");
+
+if(isset($_SESSION['usr_id'])) {
+    session_destroy();
+    unset($_SESSION['usr_id']);
+    unset($_SESSION['usr_name']);
+    header("Location: index.php");
+} else {
+    header("Location: index.php");
 }
-require 'database.php';
-if(!empty($_POST['user']) &&  !empty($_POST['password'])):
-	
-	$records = $conn->prepare('SELECT id,user,email,password FROM cphlogin_users WHERE name = :name');
-	$records->bind_param(':user', $_POST['user']);
-	$records->execute();
-	$results = $records->fetch(PDO::FETCH_ASSOC);
-	$message = '';
-	if(count($results) > 0 && password_verify($_POST['password'], $results['password']) ){
-		$_SESSION['user_id'] = $results['id'];
-		header("Location: /");
-	} else {
-		$message = 'Beklager, men kodeordene er ikke ens.';
-	}
-endif;
 ?>
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-	<title>Log ind</title>
+<meta charset="utf-8">
+<title>Untitled Document</title>
 </head>
-<body>
-
-	<a href="index.php">Tilbage til forsiden</a>
-
-	<?php if(!empty($message)): ?>
-		<p><?= $message ?></p>
-	<?php endif; ?>
-
-	<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
-		<fieldset>
-        	<legend>Log ind</legend>
-            <input type="text" placeholder="Brugernavn" name="name"><br>
-            <input type="password" placeholder="Kodeord" name="password"><br>
-			<input type="submit">
-		</fieldset>
-	</form>
-
-	<span>Gå til <a href="registerform.php">Opret bruger</a></span>
-</body>
-</html>
